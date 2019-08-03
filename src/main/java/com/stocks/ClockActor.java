@@ -32,11 +32,13 @@ public class ClockActor extends AbstractActor {
     return Props.create(ClockActor.class);
   }
 
+  private final Clock clock = new Clock();
+
   @Override
   public Receive createReceive(){
     return receiveBuilder()
             .match(ClockMessages.GetTime.class, getTime -> {
-              getSender().tell(new Clock(), getSelf());
+              getSender().tell(clock, getSelf());
             })
             .matchAny(o -> log.info("received unknown message"))
             .build();

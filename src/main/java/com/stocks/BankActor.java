@@ -11,32 +11,45 @@ public class BankActor extends AbstractActor {
 
   LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
 
-  //#user-case-classes
   public static class Bank {
-    private final String name;
-    private final int id;
+    private final List<Account> accounts;
 
     public Bank() {
-      this.name = "";
-      this.id = 1;
+      accounts = new ArrayList<>();
     }
 
-    public Bank(String name, int id) {
-      this.name = name;
-      this.id = id;
+    public void addAccount(Account account){
+      accounts.add(account);
     }
 
-    public String getName() {
-      return name;
-    }
-
-    public int getId(){
-      return id;
+    public List<Account> getAccounts(){
+      return accounts;
     }
   }
 
+  public static class Account{
+    private final float balance;
+    private final int userId;
 
-//#user-case-classes
+
+    public Account(){
+      this.balance = 0;
+      this.userId=0;
+    }
+
+    public Account(float balance,int userId){
+      this.balance = balance;
+      this.userId = userId;
+    }
+
+    public float getBalance(){
+      return balance;
+    }
+
+    public int getUserID(){
+      return userId;
+    }
+  }
 
   static Props props() {
     return Props.create(BankActor.class);
@@ -47,23 +60,9 @@ public class BankActor extends AbstractActor {
   @Override
   public Receive createReceive(){
     return receiveBuilder()
-            // .match(UserRegistryMessages.GetUsers.class, getUsers -> getSender().tell(new Users(users),getSelf()))
-            // .match(UserRegistryMessages.CreateUser.class, createUser -> {
-            //   users.add(createUser.getUser());
-            //   getSender().tell(new UserRegistryMessages.ActionPerformed(
-            //           String.format("User %s created.", createUser.getUser().getName())),getSelf());
-            // })
-            // .match(UserRegistryMessages.GetUser.class, getUser -> {
-            //   getSender().tell(users.stream()
-            //           .filter(user -> user.getName().equals(getUser.getName()))
-            //           .findFirst(), getSelf());
-            // })
-            // .match(UserRegistryMessages.DeleteUser.class, deleteUser -> {
-            //   users.removeIf(user -> user.getName().equals(deleteUser.getName()));
-            //   getSender().tell(new UserRegistryMessages.ActionPerformed(String.format("User %s deleted.", deleteUser.getName())),
-            //           getSelf());
-
-            // })
+            .match(BankMessages.GetBalance.class, getBalance -> {
+              getSender().tell(bank, getSelf());
+            })
             .matchAny(o -> log.info("received unknown message"))
             .build();
   }

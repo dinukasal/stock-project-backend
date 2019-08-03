@@ -4,8 +4,7 @@ import java.time.Duration;
 import java.util.Optional;
 import java.util.concurrent.CompletionStage;
 
-import com.stocks.MarketActor.Market;
-import com.stocks.MarketMessages.ActionPerformed;
+import com.stocks.BankMessages.*;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.event.Logging;
@@ -20,15 +19,13 @@ import akka.pattern.Patterns;
 /**
  * Routes can be defined in separated classes like shown in here
  */
-//#user-routes-class
-public class MarketRoutes extends AllDirectives {
-    //#user-routes-class
-    final private ActorRef marketActor;
+public class BankRoutes extends AllDirectives {
+    final private ActorRef bankActor;
     final private LoggingAdapter log;
 
 
-    public MarketRoutes(ActorSystem system, ActorRef marketActor) {
-        this.marketActor = marketActor;
+    public BankRoutes(ActorSystem system, ActorRef bankActor) {
+        this.bankActor = bankActor;
         log = Logging.getLogger(system, this);
     }
 
@@ -38,26 +35,27 @@ public class MarketRoutes extends AllDirectives {
     /**
      * This method creates one route (of possibly many more that will be part of your Web App)
      */
+
     public Route routes() {
-        return route(pathPrefix("market-status", () ->
+        return route(pathPrefix("get-balance", () ->
             route(
-                getStatus()
+                getBalance()
             )
         ));
     }
 
-    private Route getStatus() {
+    private Route getBalance() {
         return pathEnd(() ->
             route(
                 get(() -> {
                     
-                CompletionStage<MarketActor.Market> marketStatus = Patterns
-                        .ask(marketActor, new MarketMessages.GetCompanies(), timeout)
-                        .thenApply(MarketActor.Market.class::cast);
+                CompletionStage<BankActor.Bank> bankStatus = Patterns
+                        .ask(bankActor, new BankMessages.GetBalance(), timeout)
+                        .thenApply(BankActor.Bank.class::cast);
 
-                return onSuccess(() -> marketStatus,
-                    market -> {
-                            return complete(StatusCodes.OK, market, Jackson.marshaller());
+                return onSuccess(() -> bankStatus,
+                    bank -> {
+                            return complete(StatusCodes.OK, bank, Jackson.marshaller());
                     }
                     );
 

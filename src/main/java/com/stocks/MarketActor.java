@@ -86,17 +86,17 @@ public class MarketActor extends AbstractActor {
     }
   }
 
-//#user-case-classes
-
   static Props props() {
     return Props.create(MarketActor.class);
   }
+
+  private final Market market = new Market();
 
   @Override
   public Receive createReceive(){
     return receiveBuilder()
             .match(MarketMessages.GetCompanies.class, getCompanies -> {
-              getSender().tell(new Market(), getSelf());
+              getSender().tell(market, getSelf());
             })
             .matchAny(o -> log.info("received unknown message"))
             .build();
