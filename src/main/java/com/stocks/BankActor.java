@@ -46,7 +46,7 @@ public class BankActor extends AbstractActor {
       return balance;
     }
 
-    public int getUserID(){
+    public int getUserId(){
       return userId;
     }
   }
@@ -62,6 +62,10 @@ public class BankActor extends AbstractActor {
     return receiveBuilder()
             .match(BankMessages.GetBalance.class, getBalance -> {
               getSender().tell(bank, getSelf());
+            })
+            .match(BankMessages.CreateAccount.class, createAccount -> {
+              bank.addAccount(createAccount.getAccount());
+              // getSender().tell(createAccount.getAccount(), getSelf());
             })
             .matchAny(o -> log.info("received unknown message"))
             .build();

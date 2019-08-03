@@ -17,6 +17,8 @@ import akka.http.javadsl.server.AllDirectives;
 import akka.http.javadsl.server.PathMatchers;
 import akka.http.javadsl.server.Route;
 import akka.pattern.Patterns;
+import akka.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Routes can be defined in separated classes like shown in here
@@ -119,6 +121,7 @@ public class UserRoutes extends AllDirectives {
                                 performed -> {
                                     log.info("Created user [{}]: {}", user.getName(), performed.getDescription());
                                     return complete(StatusCodes.CREATED, performed, Jackson.marshaller());
+                                    
                                 });
                         }))
             )

@@ -7,10 +7,16 @@ import akka.japi.Creator;
 
 import java.util.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.stocks.BankActor.Account;
+import akka.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class UserRegistryActor extends AbstractActor {
 
   LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
+
+  // initial bank account balance constant for every user
+  private final int accountBalance = 100;
 
   public static class InitUser{
     private final String name;
@@ -74,6 +80,7 @@ public class UserRegistryActor extends AbstractActor {
   }
 
   private final List<User> users = new ArrayList<>();
+  // ActorRef bankActor = getContext().actorOf(BankActor.props(), "bankActor");
 
   @Override
   public Receive createReceive(){
@@ -105,6 +112,8 @@ public class UserRegistryActor extends AbstractActor {
               
               if(!exists){
                 users.add(newUser);
+                // bankActor.tell(new BankMessages.CreateAccount(new Account(accountBalance,users.size())),getSelf());
+
                 getSender().tell(new UserRegistryMessages.ActionPerformed(
                         String.format("User %s created.", recvdUser.getName())),getSelf());
               }

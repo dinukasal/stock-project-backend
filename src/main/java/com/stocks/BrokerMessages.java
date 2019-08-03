@@ -1,13 +1,12 @@
 package com.stocks;
 
-import com.stocks.BankActor.Bank;
-import com.stocks.BankActor.Account;
+import com.stocks.UserRegistryActor.User;
 
 import java.io.Serializable;
 import java.util.*;  
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public interface BankMessages {
+public interface BrokerMessages {
 
     class ActionPerformed implements Serializable {
         private final String description;
@@ -21,19 +20,11 @@ public interface BankMessages {
         }
     }
 
-    class GetBalance implements Serializable {
+
+    class Buy implements Serializable {
+
     }
+    class Sell implements Serializable {
 
-    class CreateAccount implements Serializable{
-        private final Account account;
-
-        public CreateAccount(Account account){
-            this.account = account;
-        }
-
-        public Account getAccount(){
-            return account;
-        }
     }
-
 }

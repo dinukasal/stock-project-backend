@@ -20,11 +20,15 @@ public class QuickstartServer extends AllDirectives {
     private final UserRoutes userRoutes;
     private final MarketRoutes marketRoutes;
     private final ClockRoutes clockRoutes;
+    private final BankRoutes bankRoutes;
+    private final BrokerRoutes brokerRoutes;
 
-    public QuickstartServer(ActorSystem system, ActorRef userRegistryActor,ActorRef marketActor,ActorRef clockActor) {
+    public QuickstartServer(ActorSystem system, ActorRef userRegistryActor,ActorRef marketActor,ActorRef clockActor,ActorRef bankActor,ActorRef brokerActor) {
         userRoutes = new UserRoutes(system, userRegistryActor);
         marketRoutes = new MarketRoutes(system,marketActor);
         clockRoutes = new ClockRoutes(system, clockActor);
+        bankRoutes = new BankRoutes(system,bankActor);
+        brokerRoutes = new BrokerRoutes(system,brokerActor);
     }
     //#main-class
 
@@ -40,10 +44,13 @@ public class QuickstartServer extends AllDirectives {
         ActorRef userRegistryActor = system.actorOf(UserRegistryActor.props(), "userRegistryActor");
         ActorRef marketActor = system.actorOf(MarketActor.props(), "marketActor");
         ActorRef clockActor = system.actorOf(ClockActor.props(), "clockActor");
+        ActorRef bankActor = system.actorOf(BankActor.props(), "bankActor");
+        ActorRef brokerActor = system.actorOf(BrokerActor.props(), "brokerActor");
 
+        System.out.println("Bank actor ==> "+bankActor);
         //#http-server
         //In order to access all directives we need an instance where the routes are define.
-        QuickstartServer app = new QuickstartServer(system, userRegistryActor,marketActor,clockActor);
+        QuickstartServer app = new QuickstartServer(system, userRegistryActor,marketActor,clockActor,bankActor,brokerActor);
 
         final Flow<HttpRequest, HttpResponse, NotUsed> routeFlow = app.createRoute().flow(system, materializer);
         http.bindAndHandle(routeFlow, ConnectHttp.toHost("localhost", 8080), materializer);
@@ -58,7 +65,7 @@ public class QuickstartServer extends AllDirectives {
      * Note that routes might be defined in separated classes like the current case
      */
     protected Route createRoute() {
-        return concat(userRoutes.routes(),marketRoutes.routes(),clockRoutes.routes());
+        return concat(userRoutes.routes(),marketRoutes.routes(),clockRoutes.routes(),bankRoutes.routes(),brokerRoutes.routes());
     }
 }
 //#main-class
