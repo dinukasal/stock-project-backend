@@ -64,6 +64,7 @@ public class BankActor extends AbstractActor {
               getSender().tell(bank, getSelf());
             })
             .match(BankMessages.CreateAccount.class, createAccount -> {
+              log.info("======== creating account");
               bank.addAccount(createAccount.getAccount());
               // getSender().tell(createAccount.getAccount(), getSelf());
             })

@@ -14,6 +14,7 @@ import java.util.concurrent.TimeUnit;
 public class UserRegistryActor extends AbstractActor {
 
   LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
+  ActorRef bankActor;
 
   // initial bank account balance constant for every user
   private final int accountBalance = 100;
@@ -112,7 +113,8 @@ public class UserRegistryActor extends AbstractActor {
               
               if(!exists){
                 users.add(newUser);
-                // bankActor.tell(new BankMessages.CreateAccount(new Account(accountBalance,users.size())),getSelf());
+                
+                bankActor.tell(new BankMessages.CreateAccount(new Account(accountBalance,users.size())),getSelf());
 
                 getSender().tell(new UserRegistryMessages.ActionPerformed(
                         String.format("User %s created.", recvdUser.getName())),getSelf());
@@ -128,7 +130,12 @@ public class UserRegistryActor extends AbstractActor {
               getSender().tell(new UserRegistryMessages.ActionPerformed(String.format("User %s deleted.", deleteUser.getName())),
                       getSelf());
 
-            }).matchAny(o -> log.info("received unknown message"))
+            })
+            .match(UserRegistryMessages.GetBank.class, getBank -> {
+              bankActor = getBank.getBank();
+              log.info("got bank >>> "+bankActor);
+            })
+            .matchAny(o -> log.info("received unknown message"))
             .build();
   }
 }

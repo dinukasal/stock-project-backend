@@ -48,6 +48,9 @@ public class QuickstartServer extends AllDirectives {
         ActorRef brokerActor = system.actorOf(BrokerActor.props(), "brokerActor");
 
         System.out.println("Bank actor ==> "+bankActor);
+
+        userRegistryActor.tell(new UserRegistryMessages.GetBank(bankActor),userRegistryActor);
+
         //#http-server
         //In order to access all directives we need an instance where the routes are define.
         QuickstartServer app = new QuickstartServer(system, userRegistryActor,marketActor,clockActor,bankActor,brokerActor);
