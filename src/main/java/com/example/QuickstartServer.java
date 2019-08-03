@@ -11,22 +11,25 @@ import akka.http.javadsl.server.AllDirectives;
 import akka.http.javadsl.server.Route;
 import akka.stream.ActorMaterializer;
 import akka.stream.javadsl.Flow;
+import static akka.http.javadsl.server.Directives.*;
 
 //#main-class
 public class QuickstartServer extends AllDirectives {
 
     // set up ActorSystem and other dependencies here
     private final UserRoutes userRoutes;
+    private final MarketRoutes marketRoutes;
 
-    public QuickstartServer(ActorSystem system, ActorRef userRegistryActor) {
+    public QuickstartServer(ActorSystem system, ActorRef userRegistryActor,ActorRef marketActor) {
         userRoutes = new UserRoutes(system, userRegistryActor);
+        marketRoutes = new MarketRoutes(system,marketActor);
     }
     //#main-class
 
     public static void main(String[] args) throws Exception {
         //#server-bootstrapping
         // boot up server using the route as defined below
-        ActorSystem system = ActorSystem.create("helloAkkaHttpServer");
+        ActorSystem system = ActorSystem.create("stockAkkaHttpServer");
 
         final Http http = Http.get(system);
         final ActorMaterializer materializer = ActorMaterializer.create(system);
@@ -34,9 +37,12 @@ public class QuickstartServer extends AllDirectives {
 
         ActorRef userRegistryActor = system.actorOf(UserRegistryActor.props(), "userRegistryActor");
 
+        ActorRef marketActor = system.actorOf(MarketActor.props(), "marketActor");
+
+
         //#http-server
         //In order to access all directives we need an instance where the routes are define.
-        QuickstartServer app = new QuickstartServer(system, userRegistryActor);
+        QuickstartServer app = new QuickstartServer(system, userRegistryActor,marketActor);
 
         final Flow<HttpRequest, HttpResponse, NotUsed> routeFlow = app.createRoute().flow(system, materializer);
         http.bindAndHandle(routeFlow, ConnectHttp.toHost("localhost", 8080), materializer);
@@ -51,7 +57,7 @@ public class QuickstartServer extends AllDirectives {
      * Note that routes might be defined in separated classes like the current case
      */
     protected Route createRoute() {
-        return userRoutes.routes();
+        return concat(userRoutes.routes(),marketRoutes.routes());
     }
 }
 //#main-class

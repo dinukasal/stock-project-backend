@@ -63,7 +63,6 @@
                 <archive>
                 <manifest>
                     <addClasspath>true</addClasspath>
-                    <classpathPrefix>lib/</classpathPrefix>
                     <mainClass>com.example.QuickstartServer</mainClass>
                 </manifest>
                 </archive>

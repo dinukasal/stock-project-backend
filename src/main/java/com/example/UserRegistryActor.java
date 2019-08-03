@@ -14,31 +14,27 @@ public class UserRegistryActor extends AbstractActor {
   //#user-case-classes
   public static class User {
     private final String name;
-    private final int age;
-    private final String countryOfResidence;
+    private final int id;
+    private final int balance;
 
     public User() {
-      this.name = "";
-      this.countryOfResidence = "";
-      this.age = 1;
+      this.name = "Player";
+      this.id = 1;
+      this.balance = 100;
     }
 
-    public User(String name, int age, String countryOfResidence) {
+    public User(String name, int id) {
       this.name = name;
-      this.age = age;
-      this.countryOfResidence = countryOfResidence;
+      this.id = id;
+      this.balance = 100;
     }
 
     public String getName() {
       return name;
     }
 
-    public int getAge() {
-      return age;
-    }
-
-    public String getCountryOfResidence() {
-      return countryOfResidence;
+    public int getId(){
+      return id;
     }
   }
 
