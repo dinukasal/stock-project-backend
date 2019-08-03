@@ -6,6 +6,7 @@ import akka.event.LoggingAdapter;
 import akka.japi.Creator;
 
 import java.util.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class MarketActor extends AbstractActor {
 
@@ -13,23 +14,51 @@ public class MarketActor extends AbstractActor {
 
   //#user-case-classes
   public static class Market {
-    private final Map<String, Integer> stockValues;
+    private final List<Company> companies;
 
     public Market() {
         Random rand = new Random(); 
-        this.stockValues = new HashMap<String, Integer>();
-        this.stockValues.put("Hayleys",1+rand.nextInt(100));
-        this.stockValues.put("Singer",1+rand.nextInt(100));
-        this.stockValues.put("Sampath Bank",1+rand.nextInt(100));
-        this.stockValues.put("John Keells",1+rand.nextInt(100));
-        this.stockValues.put("Cargills",1+rand.nextInt(100));
+
+        this.companies = new ArrayList<>();
+        Company c1 = new Company("Hayleys",rand.nextInt(100)+1);
+        Company c2 = new Company("Sampath Bank",rand.nextInt(100)+1);
+        Company c3 = new Company("Singer",rand.nextInt(100)+1);
+        Company c4 = new Company("NTB",rand.nextInt(100)+1);
+        Company c5 = new Company("John Keells",rand.nextInt(100)+1);
+        Company c6 = new Company("Cargills",rand.nextInt(100)+1);
+        Company c7 = new Company("Seylan Bank",rand.nextInt(100)+1);
+
+        companies.add(c1);
+        companies.add(c2);
+        companies.add(c3);
+        companies.add(c4);
+        companies.add(c5);
+        companies.add(c6);
+        companies.add(c7);
     }
 
-    public Map<String,Integer> getStatus(){
-      return this.stockValues;
+    public List<Company> getCompanies(){
+        return companies;
     }
   }
 
+  public static class Company{
+    private final String name;
+    private final int stockValue;
+
+    public Company(String name,int stockValue){
+      this.name = name;
+      this.stockValue = stockValue;
+    }
+
+    public String getName(){
+      return name;
+    }
+
+    public int getStockValue(){
+      return stockValue;
+    }
+  }
 
 //#user-case-classes
 
@@ -42,7 +71,9 @@ public class MarketActor extends AbstractActor {
   @Override
   public Receive createReceive(){
     return receiveBuilder()
-
+            .match(MarketMessages.GetCompanies.class, getCompanies -> {
+              getSender().tell(new Market(), getSelf());
+            })
             .matchAny(o -> log.info("received unknown message"))
             .build();
   }

@@ -3,6 +3,8 @@ package com.example;
 import com.example.UserRegistryActor.User;
 
 import java.io.Serializable;
+import java.util.*;  
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public interface MarketMessages {
 
@@ -33,16 +35,24 @@ public interface MarketMessages {
         }
     }
 
-    class GetMessages implements Serializable {
-        private final String name;
+    class GetCompanies implements Serializable {
+        // private final Map<String,Integer> stockValues;
 
-        public GetMessages() {
-            this.name = "test";
-        }
+        // public GetStatus(Map<String,Integer> stockValues) {
+        //     this.stockValues = stockValues;
+        // }
 
-        public String getName() {
-            return name;
-        }
+        // public String getStatus() {
+        //     String str ="";
+            
+        //     try{
+        //         str= new ObjectMapper().writeValueAsString(stockValues);
+        //     }catch(Exception e){
+
+        //     }
+
+        //     return str;
+        // }
     }
 
     class DeleteUser implements Serializable {

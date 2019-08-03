@@ -56,17 +56,16 @@ public class MarketRoutes extends AllDirectives {
         return pathEnd(() ->
             route(
                 get(() -> {
+                    
+                // return complete("....");
                 // #retrieve-user-info
-                CompletionStage<Optional<Market>> marketStatus = Patterns
-                        .ask(marketActor, new MarketMessages.GetMessages(), timeout)
-                        .thenApply(Optional.class::cast);
+                CompletionStage<MarketActor.Market> marketStatus = Patterns
+                        .ask(marketActor, new MarketMessages.GetCompanies(), timeout)
+                        .thenApply(MarketActor.Market.class::cast);
 
                 return onSuccess(() -> marketStatus,
-                    performed -> {
-                        if (performed.isPresent())
-                            return complete(StatusCodes.OK, performed.get(), Jackson.marshaller());
-                        else
-                            return complete(StatusCodes.NOT_FOUND);
+                    market -> {
+                            return complete(StatusCodes.OK, market, Jackson.marshaller());
                     }
                     );
                 //#retrieve-user-info
