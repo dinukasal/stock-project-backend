@@ -1,6 +1,7 @@
 package com.example;
 
 import com.example.UserRegistryActor.User;
+import com.example.UserRegistryActor.InitUser;
 
 import java.io.Serializable;
 
@@ -22,13 +23,13 @@ public interface UserRegistryMessages {
     }
 
     class CreateUser implements Serializable {
-        private final User user;
+        private final InitUser user;
 
-        public CreateUser(User user) {
+        public CreateUser(InitUser user) {
             this.user = user;
         }
 
-        public User getUser() {
+        public InitUser getUser() {
             return user;
         }
     }

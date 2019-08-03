@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.util.Optional;
 import java.util.concurrent.CompletionStage;
 
+import com.example.UserRegistryActor.InitUser;
 import com.example.UserRegistryActor.User;
 import com.example.UserRegistryMessages.ActionPerformed;
 import akka.actor.ActorRef;
@@ -108,8 +109,9 @@ public class UserRoutes extends AllDirectives {
                 }),
                 post(() ->
                     entity(
-                        Jackson.unmarshaller(User.class),
+                        Jackson.unmarshaller(InitUser.class),
                         user -> {
+                            log.info(user.getName());
                             CompletionStage<ActionPerformed> userCreated = Patterns
                                 .ask(userRegistryActor, new UserRegistryMessages.CreateUser(user), timeout)
                                 .thenApply(ActionPerformed.class::cast);

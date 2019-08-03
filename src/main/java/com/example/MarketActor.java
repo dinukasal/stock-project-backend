@@ -24,6 +24,10 @@ public class MarketActor extends AbstractActor {
         this.stockValues.put("John Keells",1+rand.nextInt(100));
         this.stockValues.put("Cargills",1+rand.nextInt(100));
     }
+
+    public Map<String,Integer> getStatus(){
+      return this.stockValues;
+    }
   }
 
 
