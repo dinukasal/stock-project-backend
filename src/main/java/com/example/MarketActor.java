@@ -20,13 +20,13 @@ public class MarketActor extends AbstractActor {
         Random rand = new Random(); 
 
         this.companies = new ArrayList<>();
-        Company c1 = new Company("Hayleys",rand.nextInt(100)+1);
-        Company c2 = new Company("Sampath Bank",rand.nextInt(100)+1);
-        Company c3 = new Company("Singer",rand.nextInt(100)+1);
-        Company c4 = new Company("NTB",rand.nextInt(100)+1);
-        Company c5 = new Company("John Keells",rand.nextInt(100)+1);
-        Company c6 = new Company("Cargills",rand.nextInt(100)+1);
-        Company c7 = new Company("Seylan Bank",rand.nextInt(100)+1);
+        Company c1 = new Company(1,"Hayleys",rand.nextInt(100)+1);
+        Company c2 = new Company(2,"Sampath Bank",rand.nextInt(100)+1);
+        Company c3 = new Company(3,"Singer",rand.nextInt(100)+1);
+        Company c4 = new Company(4,"NTB",rand.nextInt(100)+1);
+        Company c5 = new Company(5,"John Keells",rand.nextInt(100)+1);
+        Company c6 = new Company(6,"Cargills",rand.nextInt(100)+1);
+        Company c7 = new Company(7,"Seylan Bank",rand.nextInt(100)+1);
 
         companies.add(c1);
         companies.add(c2);
@@ -43,12 +43,14 @@ public class MarketActor extends AbstractActor {
   }
 
   public static class Company{
+    private final int id;
     private final String name;
     private final int stockValue;
 
-    public Company(String name,int stockValue){
+    public Company(int id,String name,int stockValue){
       this.name = name;
       this.stockValue = stockValue;
+      this.id=id;
     }
 
     public String getName(){
@@ -57,6 +59,10 @@ public class MarketActor extends AbstractActor {
 
     public int getStockValue(){
       return stockValue;
+    }
+
+    public int getId(){
+      return id;
     }
   }
 
