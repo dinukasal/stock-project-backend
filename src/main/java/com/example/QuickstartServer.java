@@ -19,10 +19,12 @@ public class QuickstartServer extends AllDirectives {
     // set up ActorSystem and other dependencies here
     private final UserRoutes userRoutes;
     private final MarketRoutes marketRoutes;
+    private final ClockRoutes clockRoutes;
 
-    public QuickstartServer(ActorSystem system, ActorRef userRegistryActor,ActorRef marketActor) {
+    public QuickstartServer(ActorSystem system, ActorRef userRegistryActor,ActorRef marketActor,ActorRef clockActor) {
         userRoutes = new UserRoutes(system, userRegistryActor);
         marketRoutes = new MarketRoutes(system,marketActor);
+        clockRoutes = new ClockRoutes(system, clockActor);
     }
     //#main-class
 
@@ -36,13 +38,12 @@ public class QuickstartServer extends AllDirectives {
         //#server-bootstrapping
 
         ActorRef userRegistryActor = system.actorOf(UserRegistryActor.props(), "userRegistryActor");
-
         ActorRef marketActor = system.actorOf(MarketActor.props(), "marketActor");
-
+        ActorRef clockActor = system.actorOf(ClockActor.props(), "clockActor");
 
         //#http-server
         //In order to access all directives we need an instance where the routes are define.
-        QuickstartServer app = new QuickstartServer(system, userRegistryActor,marketActor);
+        QuickstartServer app = new QuickstartServer(system, userRegistryActor,marketActor,clockActor);
 
         final Flow<HttpRequest, HttpResponse, NotUsed> routeFlow = app.createRoute().flow(system, materializer);
         http.bindAndHandle(routeFlow, ConnectHttp.toHost("localhost", 8080), materializer);
@@ -57,7 +58,7 @@ public class QuickstartServer extends AllDirectives {
      * Note that routes might be defined in separated classes like the current case
      */
     protected Route createRoute() {
-        return concat(userRoutes.routes(),marketRoutes.routes());
+        return concat(userRoutes.routes(),marketRoutes.routes(),clockRoutes.routes());
     }
 }
 //#main-class

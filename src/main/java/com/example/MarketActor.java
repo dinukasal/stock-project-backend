@@ -15,6 +15,7 @@ public class MarketActor extends AbstractActor {
   //#user-case-classes
   public static class Market {
     private final List<Company> companies;
+    private final List<Sale> sales;
 
     public Market() {
         Random rand = new Random(); 
@@ -35,6 +36,9 @@ public class MarketActor extends AbstractActor {
         companies.add(c5);
         companies.add(c6);
         companies.add(c7);
+
+        this.sales = new ArrayList<>();
+
     }
 
     public List<Company> getCompanies(){
@@ -66,13 +70,27 @@ public class MarketActor extends AbstractActor {
     }
   }
 
+  public static class Sale{
+    private final int userId;
+    private final int companyId;
+    private final int value;
+
+    public Sale(int userId,int companyId,int value){
+      this.userId=userId;
+      this.companyId=companyId;
+      this.value=value;
+    }
+
+    public int getUserId(){
+      return userId;
+    }
+  }
+
 //#user-case-classes
 
   static Props props() {
     return Props.create(MarketActor.class);
   }
-
-  private final Market market = new Market();
 
   @Override
   public Receive createReceive(){

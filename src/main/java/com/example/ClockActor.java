@@ -13,25 +13,18 @@ public class ClockActor extends AbstractActor {
 
   //#user-case-classes
   public static class Clock {
-    private final String name;
-    private final int id;
+    private final long time;
 
     public Clock() {
-      this.name = "";
-      this.id = 1;
+      this.time = System.currentTimeMillis();
     }
 
-    public Clock(String name, int id) {
-      this.name = name;
-      this.id = id;
+    public Clock(long time) {
+      this.time = time;
     }
 
-    public String getName() {
-      return name;
-    }
-
-    public int getId(){
-      return id;
+    public long getTime() {
+      return time;
     }
   }
 
@@ -42,28 +35,12 @@ public class ClockActor extends AbstractActor {
     return Props.create(ClockActor.class);
   }
 
-  private final Clock clock = new Clock();
-
   @Override
   public Receive createReceive(){
     return receiveBuilder()
-            // .match(UserRegistryMessages.GetUsers.class, getUsers -> getSender().tell(new Users(users),getSelf()))
-            // .match(UserRegistryMessages.CreateUser.class, createUser -> {
-            //   users.add(createUser.getUser());
-            //   getSender().tell(new UserRegistryMessages.ActionPerformed(
-            //           String.format("User %s created.", createUser.getUser().getName())),getSelf());
-            // })
-            // .match(UserRegistryMessages.GetUser.class, getUser -> {
-            //   getSender().tell(users.stream()
-            //           .filter(user -> user.getName().equals(getUser.getName()))
-            //           .findFirst(), getSelf());
-            // })
-            // .match(UserRegistryMessages.DeleteUser.class, deleteUser -> {
-            //   users.removeIf(user -> user.getName().equals(deleteUser.getName()));
-            //   getSender().tell(new UserRegistryMessages.ActionPerformed(String.format("User %s deleted.", deleteUser.getName())),
-            //           getSelf());
-
-            // })
+            .match(ClockMessages.GetTime.class, getTime -> {
+              getSender().tell(new Clock(), getSelf());
+            })
             .matchAny(o -> log.info("received unknown message"))
             .build();
   }

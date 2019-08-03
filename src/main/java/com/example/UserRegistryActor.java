@@ -30,20 +30,17 @@ public class UserRegistryActor extends AbstractActor {
 
   //#user-case-classes
   public static class User {
-    private final int balance;
     private final int id;
     private final String name;
 
     public User() {
       this.name = "Player";
       this.id = 1;
-      this.balance = 100;
     }
 
-    public User(String name, int id,int balance) {
+    public User(String name, int id) {
       this.name = name;
       this.id = id;
-      this.balance = balance;
     }
 
     public String getName() {
@@ -52,10 +49,6 @@ public class UserRegistryActor extends AbstractActor {
 
     public int getId(){
       return id;
-    }
-
-    public int getBalance(){
-      return balance;
     }
   }
 
@@ -102,8 +95,14 @@ public class UserRegistryActor extends AbstractActor {
                 id++;
               }
 
-              User newUser = new User(recvdUser.getName(),id,100);
+              if(users.size()==4){
+                getSender().tell(new UserRegistryMessages.ActionPerformed(
+                      String.format("Maximum number of users (4) has joined the game!")),getSelf());
+                exists = true;
+              }
 
+              User newUser = new User(recvdUser.getName(),id);
+              
               if(!exists){
                 users.add(newUser);
                 getSender().tell(new UserRegistryMessages.ActionPerformed(
