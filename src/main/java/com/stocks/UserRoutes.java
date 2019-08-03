@@ -1,12 +1,12 @@
-package com.example;
+package com.stocks;
 
 import java.time.Duration;
 import java.util.Optional;
 import java.util.concurrent.CompletionStage;
 
-import com.example.UserRegistryActor.InitUser;
-import com.example.UserRegistryActor.User;
-import com.example.UserRegistryMessages.ActionPerformed;
+import com.stocks.UserRegistryActor.InitUser;
+import com.stocks.UserRegistryActor.User;
+import com.stocks.UserRegistryMessages.ActionPerformed;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.event.Logging;

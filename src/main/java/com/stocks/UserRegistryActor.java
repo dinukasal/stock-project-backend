@@ -1,4 +1,4 @@
-package com.example;
+package com.stocks;
 
 import akka.actor.*;
 import akka.event.Logging;

@@ -1,11 +1,11 @@
-package com.example;
+package com.stocks;
 
 import java.time.Duration;
 import java.util.Optional;
 import java.util.concurrent.CompletionStage;
 
-import com.example.MarketActor.Market;
-import com.example.MarketMessages.ActionPerformed;
+import com.stocks.MarketActor.Market;
+import com.stocks.MarketMessages.ActionPerformed;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.event.Logging;
@@ -20,15 +20,15 @@ import akka.pattern.Patterns;
 /**
  * Routes can be defined in separated classes like shown in here
  */
-//#user-routes-class
-public class MarketRoutes extends AllDirectives {
-    //#user-routes-class
-    final private ActorRef marketActor;
+
+public class ClockRoutes extends AllDirectives {
+    
+    final private ActorRef clockActor;
     final private LoggingAdapter log;
 
 
-    public MarketRoutes(ActorSystem system, ActorRef marketActor) {
-        this.marketActor = marketActor;
+    public ClockRoutes(ActorSystem system, ActorRef clockActor) {
+        this.clockActor = clockActor;
         log = Logging.getLogger(system, this);
     }
 
@@ -39,36 +39,30 @@ public class MarketRoutes extends AllDirectives {
      * This method creates one route (of possibly many more that will be part of your Web App)
      */
     //#all-routes
-    //#users-get-delete
     public Route routes() {
-        return route(pathPrefix("market-status", () ->
+        return route(pathPrefix("time", () ->
             route(
-                getStatus()
+                getTime()
             )
         ));
     }
-    //#all-routes
 
-    //#users-get-delete
-
-    //#users-get-delete
-    private Route getStatus() {
+    private Route getTime() {
         return pathEnd(() ->
             route(
                 get(() -> {
-                    
-                CompletionStage<MarketActor.Market> marketStatus = Patterns
-                        .ask(marketActor, new MarketMessages.GetCompanies(), timeout)
-                        .thenApply(MarketActor.Market.class::cast);
+                CompletionStage<ClockActor.Clock> clock = Patterns
+                        .ask(clockActor, new ClockMessages.GetTime(), timeout)
+                        .thenApply(ClockActor.Clock.class::cast);
 
-                return onSuccess(() -> marketStatus,
-                    market -> {
-                            return complete(StatusCodes.OK, market, Jackson.marshaller());
+                return onSuccess(() -> clock,
+                    time -> {
+                            return complete(StatusCodes.OK, time, Jackson.marshaller());
                     }
                     );
-
                 })
             )
         );
     }
+
 }

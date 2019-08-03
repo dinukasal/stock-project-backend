@@ -1,4 +1,4 @@
-package com.example;
+package com.stocks;
 
 import akka.actor.*;
 import akka.event.Logging;
@@ -7,21 +7,21 @@ import akka.japi.Creator;
 
 import java.util.*;
 
-public class PlayerAIActor extends AbstractActor {
+public class BankActor extends AbstractActor {
 
   LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
 
   //#user-case-classes
-  public static class PlayerAI {
+  public static class Bank {
     private final String name;
     private final int id;
 
-    public PlayerAI() {
+    public Bank() {
       this.name = "";
       this.id = 1;
     }
 
-    public PlayerAI(String name, int id) {
+    public Bank(String name, int id) {
       this.name = name;
       this.id = id;
     }
@@ -39,10 +39,10 @@ public class PlayerAIActor extends AbstractActor {
 //#user-case-classes
 
   static Props props() {
-    return Props.create(PlayerAIActor.class);
+    return Props.create(BankActor.class);
   }
 
-  private final PlayerAI player = new PlayerAI();
+  private final Bank bank = new Bank();
 
   @Override
   public Receive createReceive(){

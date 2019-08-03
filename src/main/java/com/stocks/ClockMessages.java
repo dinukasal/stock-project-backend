@@ -1,12 +1,12 @@
-package com.example;
+package com.stocks;
 
-import com.example.UserRegistryActor.User;
+import com.stocks.UserRegistryActor.User;
 
 import java.io.Serializable;
 import java.util.*;  
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public interface MarketMessages {
+public interface ClockMessages {
 
     class ActionPerformed implements Serializable {
         private final String description;
@@ -20,18 +20,7 @@ public interface MarketMessages {
         }
     }
 
-    class CreateUser implements Serializable {
-        private final User user;
+    class GetTime implements Serializable {
 
-        public CreateUser(User user) {
-            this.user = user;
-        }
-
-        public User getUser() {
-            return user;
-        }
-    }
-
-    class GetCompanies implements Serializable {
     }
 }

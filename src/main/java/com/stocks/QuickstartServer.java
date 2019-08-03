@@ -1,4 +1,4 @@
-package com.example;
+package com.stocks;
 
 import akka.NotUsed;
 import akka.actor.ActorRef;

@@ -1,7 +1,7 @@
-package com.example;
+package com.stocks;
 
-import com.example.UserRegistryActor.User;
-import com.example.UserRegistryActor.InitUser;
+import com.stocks.UserRegistryActor.User;
+import com.stocks.UserRegistryActor.InitUser;
 
 import java.io.Serializable;
 

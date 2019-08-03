@@ -1,4 +1,4 @@
-package com.example;
+package com.stocks;
 
 import akka.actor.*;
 import akka.event.Logging;
@@ -11,7 +11,6 @@ public class ClockActor extends AbstractActor {
 
   LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
 
-  //#user-case-classes
   public static class Clock {
     private final long time;
 
@@ -28,8 +27,6 @@ public class ClockActor extends AbstractActor {
     }
   }
 
-
-//#user-case-classes
 
   static Props props() {
     return Props.create(ClockActor.class);
