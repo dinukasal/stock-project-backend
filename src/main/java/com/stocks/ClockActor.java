@@ -23,7 +23,7 @@ public class ClockActor extends AbstractActor {
     }
 
     public long getTime() {
-      return time;
+      return (System.currentTimeMillis()-time)/1000;
     }
   }
 
@@ -40,7 +40,7 @@ public class ClockActor extends AbstractActor {
             .match(ClockMessages.GetTime.class, getTime -> {
               getSender().tell(clock, getSelf());
             })
-            .matchAny(o -> log.info("received unknown message"))
+            .matchAny(o -> log.info("clockActor received unknown message"))
             .build();
   }
 }

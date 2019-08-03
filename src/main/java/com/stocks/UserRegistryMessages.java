@@ -22,6 +22,7 @@ public interface UserRegistryMessages {
         public String getDescription() {
             return description;
         }
+
     }
 
     class CreateUser implements Serializable {
@@ -60,15 +61,14 @@ public interface UserRegistryMessages {
         }
     }
 
-    class GetBank implements Serializable{
-        private final ActorRef bankActor;
+    class CreatedUser implements Serializable{
+        private final User user;
 
-        public GetBank(ActorRef bankActor){
-            this.bankActor = bankActor;
+        public CreatedUser(User user){
+            this.user=user;
         }
-
-        public ActorRef getBank(){
-            return bankActor;
-        }
+        public User getUser() {
+            return user;
+        }   
     }
 }

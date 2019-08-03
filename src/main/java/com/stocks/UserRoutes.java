@@ -19,6 +19,7 @@ import akka.http.javadsl.server.Route;
 import akka.pattern.Patterns;
 import akka.util.*;
 import java.util.concurrent.TimeUnit;
+import com.stocks.BankActor.Account;
 
 /**
  * Routes can be defined in separated classes like shown in here
@@ -27,11 +28,13 @@ import java.util.concurrent.TimeUnit;
 public class UserRoutes extends AllDirectives {
     //#user-routes-class
     final private ActorRef userRegistryActor;
+    final private ActorRef bankActor;
     final private LoggingAdapter log;
 
 
-    public UserRoutes(ActorSystem system, ActorRef userRegistryActor) {
+    public UserRoutes(ActorSystem system, ActorRef userRegistryActor,ActorRef bankActor) {
         this.userRegistryActor = userRegistryActor;
+        this.bankActor = bankActor;
         log = Logging.getLogger(system, this);
     }
 
@@ -114,13 +117,16 @@ public class UserRoutes extends AllDirectives {
                         Jackson.unmarshaller(InitUser.class),
                         user -> {
                             log.info(user.getName());
-                            CompletionStage<ActionPerformed> userCreated = Patterns
+                            CompletionStage<UserRegistryMessages.CreatedUser> userCreated = Patterns
                                 .ask(userRegistryActor, new UserRegistryMessages.CreateUser(user), timeout)
-                                .thenApply(ActionPerformed.class::cast);
+                                .thenApply(UserRegistryMessages.CreatedUser.class::cast);
                             return onSuccess(() -> userCreated,
                                 performed -> {
-                                    log.info("Created user [{}]: {}", user.getName(), performed.getDescription());
-                                    return complete(StatusCodes.CREATED, performed, Jackson.marshaller());
+
+                                    bankActor.tell(new BankMessages.CreateAccount(new Account(100,performed.getUser().getId())),userRegistryActor);
+                                    
+                                    log.info("Created user [{}]: {}", user.getName(), performed.getUser().getId());
+                                    return complete(StatusCodes.CREATED, performed.getUser(), Jackson.marshaller());
                                     
                                 });
                         }))

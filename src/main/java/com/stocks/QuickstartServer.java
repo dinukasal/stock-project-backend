@@ -24,7 +24,7 @@ public class QuickstartServer extends AllDirectives {
     private final BrokerRoutes brokerRoutes;
 
     public QuickstartServer(ActorSystem system, ActorRef userRegistryActor,ActorRef marketActor,ActorRef clockActor,ActorRef bankActor,ActorRef brokerActor) {
-        userRoutes = new UserRoutes(system, userRegistryActor);
+        userRoutes = new UserRoutes(system, userRegistryActor,bankActor);
         marketRoutes = new MarketRoutes(system,marketActor);
         clockRoutes = new ClockRoutes(system, clockActor);
         bankRoutes = new BankRoutes(system,bankActor);
@@ -48,8 +48,6 @@ public class QuickstartServer extends AllDirectives {
         ActorRef brokerActor = system.actorOf(BrokerActor.props(), "brokerActor");
 
         System.out.println("Bank actor ==> "+bankActor);
-
-        userRegistryActor.tell(new UserRegistryMessages.GetBank(bankActor),userRegistryActor);
 
         //#http-server
         //In order to access all directives we need an instance where the routes are define.

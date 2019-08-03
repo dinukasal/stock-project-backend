@@ -114,10 +114,10 @@ public class UserRegistryActor extends AbstractActor {
               if(!exists){
                 users.add(newUser);
                 
-                bankActor.tell(new BankMessages.CreateAccount(new Account(accountBalance,users.size())),getSelf());
+                // bankActor.tell(new BankMessages.CreateAccount(new Account(accountBalance,users.size())),getSelf());
 
-                getSender().tell(new UserRegistryMessages.ActionPerformed(
-                        String.format("User %s created.", recvdUser.getName())),getSelf());
+                getSender().tell(new UserRegistryMessages.CreatedUser(newUser),getSelf());
+                // getSender().tell(new UserRegistryMessages.ActionPerformed(String.format("User %s created.", recvdUser.getName())),getSelf());
               }
             })
             .match(UserRegistryMessages.GetUser.class, getUser -> {
@@ -130,10 +130,6 @@ public class UserRegistryActor extends AbstractActor {
               getSender().tell(new UserRegistryMessages.ActionPerformed(String.format("User %s deleted.", deleteUser.getName())),
                       getSelf());
 
-            })
-            .match(UserRegistryMessages.GetBank.class, getBank -> {
-              bankActor = getBank.getBank();
-              log.info("got bank >>> "+bankActor);
             })
             .matchAny(o -> log.info("received unknown message"))
             .build();

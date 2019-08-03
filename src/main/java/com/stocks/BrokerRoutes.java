@@ -20,12 +20,12 @@ import akka.pattern.Patterns;
  * Routes can be defined in separated classes like shown in here
  */
 public class BrokerRoutes extends AllDirectives {
-    final private ActorRef bankActor;
+    final private ActorRef brokerActor;
     final private LoggingAdapter log;
 
 
-    public BrokerRoutes(ActorSystem system, ActorRef bankActor) {
-        this.bankActor = bankActor;
+    public BrokerRoutes(ActorSystem system, ActorRef brokerActor) {
+        this.brokerActor = brokerActor;
         log = Logging.getLogger(system, this);
     }
 
@@ -37,23 +37,49 @@ public class BrokerRoutes extends AllDirectives {
      */
 
     public Route routes() {
-        return route(pathPrefix("sell", () ->
+        return route(concat(pathPrefix("sell", () ->
             route(
-                getBalance()
+                addSale()
             )
+        ),
+        pathPrefix("buy", () ->
+            route(
+                buy()
+            )
+        )
         ));
     }
 
-    private Route getBalance() {
+    private Route addSale() {
         return pathEnd(() ->
             route(
                 get(() -> {
                     
-                CompletionStage<BankActor.Bank> bankStatus = Patterns
-                        .ask(bankActor, new BankMessages.GetBalance(), timeout)
-                        .thenApply(BankActor.Bank.class::cast);
+                CompletionStage<MarketActor.Sale> addSale = Patterns
+                        .ask(brokerActor, new BrokerMessages.Sell(), timeout)
+                        .thenApply(MarketActor.Sale.class::cast);
 
-                return onSuccess(() -> bankStatus,
+                return onSuccess(() -> addSale,
+                    bank -> {
+                            return complete(StatusCodes.OK, bank, Jackson.marshaller());
+                    }
+                    );
+
+                })
+            )
+        );
+    }
+
+        private Route buy() {
+        return pathEnd(() ->
+            route(
+                get(() -> {
+                    
+                CompletionStage<MarketActor.Sale> buy = Patterns
+                        .ask(brokerActor, new BrokerMessages.Sell(), timeout)
+                        .thenApply(MarketActor.Sale.class::cast);
+
+                return onSuccess(() -> buy,
                     bank -> {
                             return complete(StatusCodes.OK, bank, Jackson.marshaller());
                     }
