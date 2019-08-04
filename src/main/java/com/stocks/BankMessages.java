@@ -48,4 +48,24 @@ public interface BankMessages {
         }
     }
 
+    class AddBalance implements Serializable{
+        private final int id;
+        private final int value;
+
+        public AddBalance(){
+            id=0;
+            value=0;
+        }
+        public AddBalance(int id,int value){
+            this.id=id;
+            this.value = value;
+        }
+
+        public int getId(){
+            return id;
+        }
+        public int getValue(){
+            return value;
+        }
+    }
 }

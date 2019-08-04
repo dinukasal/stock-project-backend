@@ -8,6 +8,7 @@ import akka.japi.Creator;
 import java.util.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Duration;
+import java.util.concurrent.TimeUnit;
 
 public class MarketActor extends AbstractActor {
 
@@ -243,8 +244,13 @@ public class MarketActor extends AbstractActor {
               
             })
             .match(MarketMessages.ChangeCompanyValues.class, req -> {
-              market.changeCompanyValues();
-              getSender().tell(market, getSelf());
+              for(int i=0;i<10;i++){
+                TimeUnit.MINUTES.sleep(1);
+                log.info("### changing company values ###");
+                market.changeCompanyValues();
+              }
+
+              // getSender().tell(market, getSelf());
             })
             .matchAny(o -> log.info("received unknown message"))
             .build();

@@ -7,6 +7,13 @@ import akka.japi.Creator;
 import com.stocks.UserRegistryActor.User;
 import java.util.concurrent.TimeUnit;
 import java.util.*;
+import java.time.Duration;
+import akka.pattern.Patterns;
+import java.util.concurrent.CompletionStage;
+// import akka.dispatch.Await;
+// import akka.dispatch.Future;
+import scala.concurrent.Future;
+import scala.concurrent.Await;
 
 public class PlayerAIActor extends AbstractActor {
   ActorRef userRegistryActor;
@@ -52,8 +59,16 @@ public class PlayerAIActor extends AbstractActor {
               brokerActor = actors.getBrokerActor();
             })
             .match(PlayerAIMessages.LookPlayerCompletion.class, look -> {
-              TimeUnit.SECONDS.sleep(59);
-              getSender().tell("ok",getSelf());
+              TimeUnit.SECONDS.sleep(5);
+              log.info("##### AI Creating players ## ");
+              
+              int missingCount = 0;
+
+              Duration timeout = Duration.ofSeconds(1l);
+
+              // Future<List<User>> res = Patterns.ask(userRegistryActor, new UserRegistryMessages.GetUsers(),timeout);
+              // Await.result(res,timeout);
+
             })
             .matchAny(o -> log.info("received unknown message"))
             .build();

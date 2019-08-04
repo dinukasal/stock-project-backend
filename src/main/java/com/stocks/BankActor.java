@@ -55,6 +55,17 @@ public class BankActor extends AbstractActor {
 
       return true;
     }
+
+    public Account addBalance(int id,int value){
+      Account acc = findAccount(id);
+
+      if(acc.getUserId()==0){
+        return new Account();
+      }
+
+      acc.setBalance(acc.getBalance()+value);
+      return acc;
+    }
   }
 
   public static class Account{
@@ -109,6 +120,10 @@ public class BankActor extends AbstractActor {
               log.info("======== creating account");
               bank.addAccount(createAccount.getAccount());
               // getSender().tell(createAccount.getAccount(), getSelf());
+            })
+            .match(BankMessages.AddBalance.class, acc -> {
+              Account res = bank.addBalance(acc.getId(),-acc.getValue());
+              getSender().tell(res, getSelf());
             })
             .matchAny(o -> log.info("received unknown message"))
             .build();

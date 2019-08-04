@@ -56,7 +56,7 @@ public class BrokerRoutes extends AllDirectives {
             ),
             pathPrefix("buy-company", () ->
                 route(
-                    buySale()
+                    buyCompany()
                 )
             )
         ));
@@ -118,4 +118,29 @@ public class BrokerRoutes extends AllDirectives {
         );
     }
 
+    private Route buyCompany() {
+        return pathEnd(() ->
+            route(
+                post(() -> 
+                    entity(
+                        Jackson.unmarshaller(MarketActor.Sale.class),
+                        sale->{
+                            log.info("Buying shares from company:"+sale.getCompanyId());
+                            CompletionStage<BankActor.Account> addSale = Patterns
+                                    .ask(bankActor, new BankMessages.AddBalance(sale.getUserId(),sale.getValue()), timeout)
+                                    .thenApply(BankActor.Account.class::cast);
+
+                            return onSuccess(() -> addSale,
+                                account -> {
+                                    if(account.getUserId()>0){
+                                        return complete(StatusCodes.OK, account, Jackson.marshaller());
+                                    }else{
+                                        return complete(StatusCodes.INTERNAL_SERVER_ERROR,"Error buying!");
+                                    }
+                                });
+                        }
+                    ))
+            )
+        );
+    }
 }
