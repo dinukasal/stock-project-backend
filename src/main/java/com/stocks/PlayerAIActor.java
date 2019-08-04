@@ -5,6 +5,8 @@ import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import akka.japi.Creator;
 import com.stocks.UserRegistryActor.User;
+import com.stocks.UserRegistryActor.Users;
+import com.stocks.UserRegistryActor.InitUser;
 import java.util.concurrent.TimeUnit;
 import java.util.*;
 import java.time.Duration;
@@ -65,10 +67,17 @@ public class PlayerAIActor extends AbstractActor {
               int missingCount = 0;
 
               Duration timeout = Duration.ofSeconds(1l);
+              
+              CompletionStage<UserRegistryActor.Users> getUsers = Patterns
+                      .ask(userRegistryActor, new UserRegistryMessages.GetUsers(), timeout).thenApply(UserRegistryActor.Users.class::cast);
 
-              // Future<List<User>> res = Patterns.ask(userRegistryActor, new UserRegistryMessages.GetUsers(),timeout);
-              // Await.result(res,timeout);
+              Users users = getUsers.toCompletableFuture().get();
+              int usercount = users.getUsers().size();
+              missingCount = 4-usercount;
 
+              for(int i=0;i<missingCount;i++){
+                userRegistryActor.tell(new UserRegistryMessages.CreateUser(new InitUser("AIPlayer"+Integer.toString(i))),userRegistryActor);
+              }
             })
             .matchAny(o -> log.info("received unknown message"))
             .build();

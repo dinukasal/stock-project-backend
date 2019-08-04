@@ -31,14 +31,16 @@ public class UserRoutes extends AllDirectives {
     final private ActorRef bankActor;
     final private ActorRef clockActor;
     final private ActorRef aiActor;
+    final private ActorRef marketActor;
     final private LoggingAdapter log;
     final private int BANK_BALANCE=100;
 
-    public UserRoutes(ActorSystem system, ActorRef userRegistryActor,ActorRef bankActor,ActorRef clockActor,ActorRef aiActor) {
+    public UserRoutes(ActorSystem system, ActorRef userRegistryActor,ActorRef bankActor,ActorRef clockActor,ActorRef aiActor,ActorRef marketActor) {
         this.userRegistryActor = userRegistryActor;
         this.bankActor = bankActor;
         this.clockActor = clockActor;
         this.aiActor = aiActor;
+        this.marketActor = marketActor;
         log = Logging.getLogger(system, this);
     }
 
@@ -132,6 +134,7 @@ public class UserRoutes extends AllDirectives {
                                     if(performed.getUser().getId()==1){
                                         clockActor.tell(new ClockMessages.ResetTime(),userRegistryActor);
                                         aiActor.tell(new PlayerAIMessages.LookPlayerCompletion(),userRegistryActor);
+                                        marketActor.tell(new MarketMessages.ChangeCompanyValues(),userRegistryActor);                                   
                                     }
 
                                     log.info("Created user [{}]: {}", user.getName(), performed.getUser().getId());
