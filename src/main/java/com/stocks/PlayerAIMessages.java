@@ -30,11 +30,13 @@ public interface PlayerAIMessages {
         private final ActorRef clockActor;
         private final ActorRef brokerActor;
         private final ActorRef userRegistryActor;
+        private final ActorRef marketActor;
 
-        public SetActors(ActorRef clockActor,ActorRef brokerActor,ActorRef userRegistryActor){
+        public SetActors(ActorRef clockActor,ActorRef brokerActor,ActorRef userRegistryActor,ActorRef marketActor){
             this.clockActor = clockActor;
             this.brokerActor = brokerActor;
             this.userRegistryActor = userRegistryActor;
+            this.marketActor = marketActor;
         }
 
         public ActorRef getClockActor(){
@@ -48,6 +50,14 @@ public interface PlayerAIMessages {
         public ActorRef getUserRegistryActor(){
             return userRegistryActor;
         }
+
+        public ActorRef getMarketActor(){
+            return marketActor;
+        }
+
+    }
+
+    class Play implements Serializable{
 
     }
 }

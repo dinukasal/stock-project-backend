@@ -48,7 +48,7 @@ public class QuickstartServer extends AllDirectives {
         ActorRef brokerActor = system.actorOf(BrokerActor.props(), "brokerActor");
         ActorRef aiActor = system.actorOf(PlayerAIActor.props(), "aiActor");
 
-        aiActor.tell(new PlayerAIMessages.SetActors(clockActor,marketActor,userRegistryActor),aiActor);
+        aiActor.tell(new PlayerAIMessages.SetActors(clockActor,marketActor,userRegistryActor,marketActor),aiActor);
         marketActor.tell(new MarketMessages.SetActors(bankActor),bankActor);
 
         //#http-server

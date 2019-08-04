@@ -29,7 +29,9 @@ public class BrokerActor extends AbstractActor {
   @Override
   public Receive createReceive(){
     return receiveBuilder()
-            
+            .match(MarketMessages.Buy.class, buy->{
+              
+            })
             .matchAny(o -> log.info("received unknown message"))
             .build();
   }

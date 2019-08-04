@@ -260,13 +260,10 @@ public class MarketActor extends AbstractActor {
               
             })
             .match(MarketMessages.ChangeCompanyValues.class, req -> {
-              for(int i=0;i<10;i++){
-                // TimeUnit.MINUTES.sleep(1);
+
                 log.info("### changing company values ###");
                 market.changeCompanyValues();
-              }
-
-              // getSender().tell(market, getSelf());
+                getSender().tell(market, getSelf());
             })
             .matchAny(o -> log.info("received unknown message"))
             .build();
