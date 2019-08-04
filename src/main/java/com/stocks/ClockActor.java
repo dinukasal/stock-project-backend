@@ -12,7 +12,7 @@ public class ClockActor extends AbstractActor {
   LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
 
   public static class Clock {
-    private final long time;
+    private long time;
 
     public Clock() {
       this.time = System.currentTimeMillis();
@@ -24,6 +24,10 @@ public class ClockActor extends AbstractActor {
 
     public long getTime() {
       return (System.currentTimeMillis()-time)/1000;
+    }
+
+    public void setTime(long time){
+      this.time = time;
     }
   }
 
@@ -38,6 +42,10 @@ public class ClockActor extends AbstractActor {
   public Receive createReceive(){
     return receiveBuilder()
             .match(ClockMessages.GetTime.class, getTime -> {
+              getSender().tell(clock, getSelf());
+            })
+            .match(ClockMessages.ResetTime.class, reset -> {
+              clock.setTime(System.currentTimeMillis());
               getSender().tell(clock, getSelf());
             })
             .matchAny(o -> log.info("clockActor received unknown message"))

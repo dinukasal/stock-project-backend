@@ -40,10 +40,18 @@ public class ClockRoutes extends AllDirectives {
      */
     //#all-routes
     public Route routes() {
-        return route(pathPrefix("time", () ->
-            route(
-                getTime()
-            )
+        return route(
+            concat(
+                pathPrefix("time", () ->
+                    route(
+                        getTime()
+                    )
+                ),
+                pathPrefix("reset-time", () ->
+                    route(
+                        resetTime()
+                    )
+                )
         ));
     }
 
@@ -53,6 +61,24 @@ public class ClockRoutes extends AllDirectives {
                 get(() -> {
                 CompletionStage<ClockActor.Clock> clock = Patterns
                         .ask(clockActor, new ClockMessages.GetTime(), timeout)
+                        .thenApply(ClockActor.Clock.class::cast);
+
+                return onSuccess(() -> clock,
+                    time -> {
+                            return complete(StatusCodes.OK, time, Jackson.marshaller());
+                    }
+                    );
+                })
+            )
+        );
+    }
+
+        private Route resetTime() {
+        return pathEnd(() ->
+            route(
+                get(() -> {
+                CompletionStage<ClockActor.Clock> clock = Patterns
+                        .ask(clockActor, new ClockMessages.ResetTime(), timeout)
                         .thenApply(ClockActor.Clock.class::cast);
 
                 return onSuccess(() -> clock,
