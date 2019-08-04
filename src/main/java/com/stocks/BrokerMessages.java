@@ -27,4 +27,10 @@ public interface BrokerMessages {
     class Sell implements Serializable {
 
     }
+    class GetSales implements Serializable{
+
+    }
+    class GetStockValues implements Serializable{
+        
+    }
 }

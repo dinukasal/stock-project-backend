@@ -30,13 +30,15 @@ public class UserRoutes extends AllDirectives {
     final private ActorRef userRegistryActor;
     final private ActorRef bankActor;
     final private ActorRef clockActor;
+    final private ActorRef aiActor;
     final private LoggingAdapter log;
     final private int BANK_BALANCE=100;
 
-    public UserRoutes(ActorSystem system, ActorRef userRegistryActor,ActorRef bankActor,ActorRef clockActor) {
+    public UserRoutes(ActorSystem system, ActorRef userRegistryActor,ActorRef bankActor,ActorRef clockActor,ActorRef aiActor) {
         this.userRegistryActor = userRegistryActor;
         this.bankActor = bankActor;
         this.clockActor = clockActor;
+        this.aiActor = aiActor;
         log = Logging.getLogger(system, this);
     }
 
@@ -129,6 +131,7 @@ public class UserRoutes extends AllDirectives {
                                     
                                     if(performed.getUser().getId()==1){
                                         clockActor.tell(new ClockMessages.ResetTime(),userRegistryActor);
+                                        aiActor.tell(new PlayerAIMessages.LookPlayerCompletion(),userRegistryActor);
                                     }
 
                                     log.info("Created user [{}]: {}", user.getName(), performed.getUser().getId());

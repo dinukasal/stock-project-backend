@@ -5,11 +5,13 @@ import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import akka.japi.Creator;
 import com.stocks.UserRegistryActor.User;
-
+import java.util.concurrent.TimeUnit;
 import java.util.*;
 
 public class PlayerAIActor extends AbstractActor {
-
+  ActorRef userRegistryActor;
+  ActorRef clockActor;
+  ActorRef brokerActor;
   LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
 
   public static class AIPlayers{
@@ -34,8 +36,6 @@ public class PlayerAIActor extends AbstractActor {
   }
 
 
-//#user-case-classes
-
   static Props props() {
     return Props.create(PlayerAIActor.class);
   }
@@ -45,6 +45,16 @@ public class PlayerAIActor extends AbstractActor {
   @Override
   public Receive createReceive(){
     return receiveBuilder()
+            .match(PlayerAIMessages.SetActors.class, actors -> {
+              log.info(">>> setting actors refs in AIActor");
+              userRegistryActor = actors.getUserRegistryActor();
+              clockActor = actors.getClockActor();
+              brokerActor = actors.getBrokerActor();
+            })
+            .match(PlayerAIMessages.LookPlayerCompletion.class, look -> {
+              TimeUnit.SECONDS.sleep(59);
+              getSender().tell("ok",getSelf());
+            })
             .matchAny(o -> log.info("received unknown message"))
             .build();
   }

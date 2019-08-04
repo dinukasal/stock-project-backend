@@ -23,8 +23,8 @@ public class QuickstartServer extends AllDirectives {
     private final BankRoutes bankRoutes;
     private final BrokerRoutes brokerRoutes;
 
-    public QuickstartServer(ActorSystem system, ActorRef userRegistryActor,ActorRef marketActor,ActorRef clockActor,ActorRef bankActor,ActorRef brokerActor) {
-        userRoutes = new UserRoutes(system, userRegistryActor,bankActor,clockActor);
+    public QuickstartServer(ActorSystem system, ActorRef userRegistryActor,ActorRef marketActor,ActorRef clockActor,ActorRef bankActor,ActorRef brokerActor,ActorRef aiActor) {
+        userRoutes = new UserRoutes(system, userRegistryActor,bankActor,clockActor,aiActor);
         marketRoutes = new MarketRoutes(system,marketActor);
         clockRoutes = new ClockRoutes(system, clockActor);
         bankRoutes = new BankRoutes(system,bankActor);
@@ -46,12 +46,14 @@ public class QuickstartServer extends AllDirectives {
         ActorRef clockActor = system.actorOf(ClockActor.props(), "clockActor");
         ActorRef bankActor = system.actorOf(BankActor.props(), "bankActor");
         ActorRef brokerActor = system.actorOf(BrokerActor.props(), "brokerActor");
+        ActorRef aiActor = system.actorOf(PlayerAIActor.props(), "aiActor");
 
         System.out.println("Bank actor ==> "+bankActor);
+        aiActor.tell(new PlayerAIMessages.SetActors(clockActor,marketActor,userRegistryActor),aiActor);
 
         //#http-server
         //In order to access all directives we need an instance where the routes are define.
-        QuickstartServer app = new QuickstartServer(system, userRegistryActor,marketActor,clockActor,bankActor,brokerActor);
+        QuickstartServer app = new QuickstartServer(system, userRegistryActor,marketActor,clockActor,bankActor,brokerActor,aiActor);
 
         final Flow<HttpRequest, HttpResponse, NotUsed> routeFlow = app.createRoute().flow(system, materializer);
         http.bindAndHandle(routeFlow, ConnectHttp.toHost("localhost", 8080), materializer);
