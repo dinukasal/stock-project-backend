@@ -74,4 +74,7 @@ public interface MarketMessages {
         }
 
     }
+    class ChangeCompanyValues implements Serializable{
+        
+    }
 }

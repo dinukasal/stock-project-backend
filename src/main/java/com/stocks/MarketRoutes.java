@@ -39,10 +39,18 @@ public class MarketRoutes extends AllDirectives {
      * This method creates one route (of possibly many more that will be part of your Web App)
      */
     public Route routes() {
-        return route(pathPrefix("market-status", () ->
-            route(
-                getStatus()
-            )
+        return route(
+            concat(
+                pathPrefix("market-status", () ->
+                    route(
+                        getStatus()
+                    )
+                ),
+                pathPrefix("change-values", () ->
+                    route(
+                        changeValues()
+                    )
+                )
         ));
     }
 
@@ -56,6 +64,26 @@ public class MarketRoutes extends AllDirectives {
                         .thenApply(MarketActor.Market.class::cast);
 
                 return onSuccess(() -> marketStatus,
+                    market -> {
+                            return complete(StatusCodes.OK, market, Jackson.marshaller());
+                    }
+                    );
+
+                })
+            )
+        );
+    }
+
+    private Route changeValues() {
+        return pathEnd(() ->
+            route(
+                get(() -> {
+                    
+                CompletionStage<MarketActor.Market> changeValues = Patterns
+                        .ask(marketActor, new MarketMessages.ChangeCompanyValues(), timeout)
+                        .thenApply(MarketActor.Market.class::cast);
+
+                return onSuccess(() -> changeValues,
                     market -> {
                             return complete(StatusCodes.OK, market, Jackson.marshaller());
                     }

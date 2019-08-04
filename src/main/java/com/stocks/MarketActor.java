@@ -103,12 +103,19 @@ public class MarketActor extends AbstractActor {
       }
 
     }
+
+    public void changeCompanyValues(){
+      Random rand = new Random(); 
+      for(Company c:companies){
+        c.setValue(rand.nextInt(100)+1);
+      }
+    }
   }
 
   public static class Company{
     private final int id;
     private final String name;
-    private final int stockValue;
+    private int stockValue;
 
     public Company(int id,String name,int stockValue){
       this.name = name;
@@ -126,6 +133,10 @@ public class MarketActor extends AbstractActor {
 
     public int getId(){
       return id;
+    }
+
+    public void setValue(int value){
+      stockValue = value;
     }
   }
 
@@ -230,6 +241,10 @@ public class MarketActor extends AbstractActor {
               exists = market.removeSale(t);
               //reducing bank balance of user
               
+            })
+            .match(MarketMessages.ChangeCompanyValues.class, req -> {
+              market.changeCompanyValues();
+              getSender().tell(market, getSelf());
             })
             .matchAny(o -> log.info("received unknown message"))
             .build();
