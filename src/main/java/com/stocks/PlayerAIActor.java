@@ -95,7 +95,7 @@ public class PlayerAIActor extends AbstractActor {
               int count = players.getPlayers().size();
               int selectedId = ((int)System.currentTimeMillis())%count;
               int companyId = ((int)System.currentTimeMillis())%10;
-              int value = ((int)System.currentTimeMillis())%50;
+              int value = ((int)System.currentTimeMillis())%50+50;
               
               log.info("## AI playing ## "+selectedId);
 
