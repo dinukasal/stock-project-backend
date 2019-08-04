@@ -12,26 +12,10 @@ public class AnalystActor extends AbstractActor {
   LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
 
   public static class Analyst {
-    private final String name;
-    private final int id;
 
     public Analyst() {
-      this.name = "";
-      this.id = 1;
     }
 
-    public Analyst(String name, int id) {
-      this.name = name;
-      this.id = id;
-    }
-
-    public String getName() {
-      return name;
-    }
-
-    public int getId(){
-      return id;
-    }
   }
 
 
@@ -44,7 +28,9 @@ public class AnalystActor extends AbstractActor {
   @Override
   public Receive createReceive(){
     return receiveBuilder()
+            .match(AnalystMessages.GetTip.class, getTip -> {
 
+            })
             .matchAny(o -> log.info("received unknown message"))
             .build();
   }

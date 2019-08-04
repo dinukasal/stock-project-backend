@@ -22,6 +22,7 @@ public class QuickstartServer extends AllDirectives {
     private final ClockRoutes clockRoutes;
     private final BankRoutes bankRoutes;
     private final BrokerRoutes brokerRoutes;
+    private final AnalystRoutes analystRoutes;
 
     public QuickstartServer(ActorSystem system, ActorRef userRegistryActor,ActorRef marketActor,ActorRef clockActor,ActorRef bankActor,ActorRef brokerActor,ActorRef aiActor) {
         userRoutes = new UserRoutes(system, userRegistryActor,bankActor,clockActor,aiActor,marketActor);
@@ -29,6 +30,7 @@ public class QuickstartServer extends AllDirectives {
         clockRoutes = new ClockRoutes(system, clockActor);
         bankRoutes = new BankRoutes(system,bankActor);
         brokerRoutes = new BrokerRoutes(system,brokerActor,marketActor,bankActor);
+        analystRoutes = new AnalystRoutes(system,marketActor);
     }
     //#main-class
 
@@ -47,6 +49,7 @@ public class QuickstartServer extends AllDirectives {
         ActorRef bankActor = system.actorOf(BankActor.props(), "bankActor");
         ActorRef brokerActor = system.actorOf(BrokerActor.props(), "brokerActor");
         ActorRef aiActor = system.actorOf(PlayerAIActor.props(), "aiActor");
+        ActorRef analystActor = system.actorOf(AnalystActor.props(), "analystActor");
 
         aiActor.tell(new PlayerAIMessages.SetActors(clockActor,marketActor,userRegistryActor,marketActor),aiActor);
         marketActor.tell(new MarketMessages.SetActors(bankActor),bankActor);
@@ -68,7 +71,7 @@ public class QuickstartServer extends AllDirectives {
      * Note that routes might be defined in separated classes like the current case
      */
     protected Route createRoute() {
-        return concat(userRoutes.routes(),marketRoutes.routes(),clockRoutes.routes(),bankRoutes.routes(),brokerRoutes.routes());
+        return concat(userRoutes.routes(),marketRoutes.routes(),clockRoutes.routes(),bankRoutes.routes(),brokerRoutes.routes(),analystRoutes.routes());
     }
 }
 //#main-class
