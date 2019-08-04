@@ -81,7 +81,6 @@ public class UserRegistryActor extends AbstractActor {
   }
 
   private final List<User> users = new ArrayList<>();
-  // ActorRef bankActor = getContext().actorOf(BankActor.props(), "bankActor");
 
   @Override
   public Receive createReceive(){

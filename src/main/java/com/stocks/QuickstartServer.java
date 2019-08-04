@@ -24,7 +24,7 @@ public class QuickstartServer extends AllDirectives {
     private final BrokerRoutes brokerRoutes;
 
     public QuickstartServer(ActorSystem system, ActorRef userRegistryActor,ActorRef marketActor,ActorRef clockActor,ActorRef bankActor,ActorRef brokerActor) {
-        userRoutes = new UserRoutes(system, userRegistryActor,bankActor);
+        userRoutes = new UserRoutes(system, userRegistryActor,bankActor,clockActor);
         marketRoutes = new MarketRoutes(system,marketActor);
         clockRoutes = new ClockRoutes(system, clockActor);
         bankRoutes = new BankRoutes(system,bankActor);

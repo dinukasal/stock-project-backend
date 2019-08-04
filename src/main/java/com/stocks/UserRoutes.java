@@ -29,12 +29,14 @@ public class UserRoutes extends AllDirectives {
     //#user-routes-class
     final private ActorRef userRegistryActor;
     final private ActorRef bankActor;
+    final private ActorRef clockActor;
     final private LoggingAdapter log;
+    final private int BANK_BALANCE=100;
 
-
-    public UserRoutes(ActorSystem system, ActorRef userRegistryActor,ActorRef bankActor) {
+    public UserRoutes(ActorSystem system, ActorRef userRegistryActor,ActorRef bankActor,ActorRef clockActor) {
         this.userRegistryActor = userRegistryActor;
         this.bankActor = bankActor;
+        this.clockActor = clockActor;
         log = Logging.getLogger(system, this);
     }
 
@@ -123,8 +125,12 @@ public class UserRoutes extends AllDirectives {
                             return onSuccess(() -> userCreated,
                                 performed -> {
 
-                                    bankActor.tell(new BankMessages.CreateAccount(new Account(100,performed.getUser().getId())),userRegistryActor);
+                                    bankActor.tell(new BankMessages.CreateAccount(new Account(BANK_BALANCE,performed.getUser().getId())),userRegistryActor);
                                     
+                                    if(performed.getUser().getId()==1){
+                                        clockActor.tell(new ClockMessages.ResetTime(),userRegistryActor);
+                                    }
+
                                     log.info("Created user [{}]: {}", user.getName(), performed.getUser().getId());
                                     return complete(StatusCodes.CREATED, performed.getUser(), Jackson.marshaller());
                                     

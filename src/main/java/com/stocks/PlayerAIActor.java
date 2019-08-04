@@ -4,6 +4,7 @@ import akka.actor.*;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import akka.japi.Creator;
+import com.stocks.UserRegistryActor.User;
 
 import java.util.*;
 
@@ -11,27 +12,24 @@ public class PlayerAIActor extends AbstractActor {
 
   LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
 
-  //#user-case-classes
-  public static class PlayerAI {
-    private final String name;
-    private final int id;
+  public static class AIPlayers{
+    private final List<User> players;
 
-    public PlayerAI() {
-      this.name = "";
-      this.id = 1;
+    public AIPlayers() {
+      this.players = new ArrayList<>();
     }
 
-    public PlayerAI(String name, int id) {
-      this.name = name;
-      this.id = id;
+    public AIPlayers(List<User> players) {
+      this.players = players;
     }
 
-    public String getName() {
-      return name;
+    public List<User> getUsers() {
+      return players;
     }
 
-    public int getId(){
-      return id;
+    public User addAIPlayer(User user){
+      players.add(user);
+      return user;
     }
   }
 
@@ -42,7 +40,7 @@ public class PlayerAIActor extends AbstractActor {
     return Props.create(PlayerAIActor.class);
   }
 
-  private final PlayerAI player = new PlayerAI();
+  private final AIPlayers players = new AIPlayers();
 
   @Override
   public Receive createReceive(){
