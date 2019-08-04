@@ -6,6 +6,7 @@ import com.stocks.MarketActor.Sale;
 import java.io.Serializable;
 import java.util.*;  
 import com.fasterxml.jackson.databind.ObjectMapper;
+import akka.actor.ActorRef;
 
 public interface MarketMessages {
 
@@ -58,5 +59,18 @@ public interface MarketMessages {
         public Buy(Sale sale){
             this.sale=sale;
         }
+    }
+
+    class SetActors implements Serializable{
+        private final ActorRef bankActor;
+     
+        public SetActors(ActorRef bankActor){
+            this.bankActor = bankActor;
+        }
+
+        public ActorRef getBankActor(){
+            return bankActor;
+        }
+
     }
 }

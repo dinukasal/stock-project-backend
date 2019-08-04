@@ -46,7 +46,7 @@ public class PlayerAIActor extends AbstractActor {
   public Receive createReceive(){
     return receiveBuilder()
             .match(PlayerAIMessages.SetActors.class, actors -> {
-              log.info(">>> setting actors refs in AIActor");
+              log.info(">>> setting actor refs in AIActor");
               userRegistryActor = actors.getUserRegistryActor();
               clockActor = actors.getClockActor();
               brokerActor = actors.getBrokerActor();

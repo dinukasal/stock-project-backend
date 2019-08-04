@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class MarketActor extends AbstractActor {
 
+  ActorRef bankActor;
   LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
 
   //#user-case-classes
@@ -28,6 +29,9 @@ public class MarketActor extends AbstractActor {
         Company c5 = new Company(5,"John Keells",rand.nextInt(100)+1);
         Company c6 = new Company(6,"Cargills",rand.nextInt(100)+1);
         Company c7 = new Company(7,"Seylan Bank",rand.nextInt(100)+1);
+        Company c8 = new Company(8,"Highland",rand.nextInt(100)+1);
+        Company c9 = new Company(9,"Coca Cola",rand.nextInt(100)+1);
+        Company c10 = new Company(10,"Elephant House",rand.nextInt(100)+1);
 
         companies.add(c1);
         companies.add(c2);
@@ -36,6 +40,9 @@ public class MarketActor extends AbstractActor {
         companies.add(c5);
         companies.add(c6);
         companies.add(c7);
+        companies.add(c8);
+        companies.add(c9);
+        companies.add(c10);
 
         this.sales = new ArrayList<>();
 
@@ -155,6 +162,10 @@ public class MarketActor extends AbstractActor {
   @Override
   public Receive createReceive(){
     return receiveBuilder()
+            .match(MarketMessages.SetActors.class, actors -> {
+              log.info(">>> setting actor refs in MarketActor");
+              bankActor = actors.getBankActor();
+            })
             .match(MarketMessages.GetCompanies.class, getCompanies -> {
               getSender().tell(market, getSelf());
             })
