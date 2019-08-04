@@ -4,6 +4,7 @@ import akka.actor.*;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import akka.japi.Creator;
+import com.stocks.MarketActor.SaleTransaction;
 
 import java.util.*;
 
@@ -25,10 +26,39 @@ public class BankActor extends AbstractActor {
     public List<Account> getAccounts(){
       return accounts;
     }
+
+    public Account findAccount(int userId){
+      for(Account a:accounts){
+        if(a.getUserId()==userId){
+          return a;
+        }
+      }
+      return new Account();
+    }
+
+    public boolean doTransaction(SaleTransaction t){
+      Account seller = findAccount(t.getSellerId());
+      Account buyer = findAccount(t.getBuyerId());
+
+      //if user accounts are wrong
+      if(seller.getUserId()==0 || buyer.getUserId()==0){
+        return false;
+      }
+
+      // if buyer account has low balance
+      if(buyer.getBalance()<t.getValue()){
+        return false;
+      }
+
+      seller.setBalance(seller.getBalance()+t.getValue());
+      buyer.setBalance(buyer.getBalance()-t.getValue());
+
+      return true;
+    }
   }
 
   public static class Account{
-    private final float balance;
+    private int balance;
     private final int userId;
 
 
@@ -37,17 +67,21 @@ public class BankActor extends AbstractActor {
       this.userId=0;
     }
 
-    public Account(float balance,int userId){
+    public Account(int balance,int userId){
       this.balance = balance;
       this.userId = userId;
     }
 
-    public float getBalance(){
+    public int getBalance(){
       return balance;
     }
 
     public int getUserId(){
       return userId;
+    }
+
+    public void setBalance(int bal){
+      balance = bal;
     }
   }
 
@@ -62,6 +96,14 @@ public class BankActor extends AbstractActor {
     return receiveBuilder()
             .match(BankMessages.GetBalance.class, getBalance -> {
               getSender().tell(bank, getSelf());
+            })
+            .match(BankMessages.DoTransaction.class, req -> {
+              boolean success = bank.doTransaction(req.getTransaction());
+              if(success){
+                getSender().tell(req.getTransaction(),getSelf());
+              }else{
+                getSender().tell(new SaleTransaction(),getSelf());
+              }
             })
             .match(BankMessages.CreateAccount.class, createAccount -> {
               log.info("======== creating account");

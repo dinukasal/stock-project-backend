@@ -2,6 +2,7 @@ package com.stocks;
 
 import com.stocks.BankActor.Bank;
 import com.stocks.BankActor.Account;
+import com.stocks.MarketActor.SaleTransaction;
 
 import java.io.Serializable;
 import java.util.*;  
@@ -33,6 +34,17 @@ public interface BankMessages {
 
         public Account getAccount(){
             return account;
+        }
+    }
+
+    class DoTransaction implements Serializable{
+        private final SaleTransaction t;
+        public DoTransaction(SaleTransaction t){
+            this.t=t;
+        }
+
+        public SaleTransaction getTransaction(){
+            return t;
         }
     }
 

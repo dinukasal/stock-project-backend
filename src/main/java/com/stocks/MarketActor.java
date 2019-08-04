@@ -7,6 +7,7 @@ import akka.japi.Creator;
 
 import java.util.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.Duration;
 
 public class MarketActor extends AbstractActor {
 
@@ -75,15 +76,15 @@ public class MarketActor extends AbstractActor {
       return sales;
     }
 
-    public boolean removeSale(Sale sale){
+    public boolean removeSale(SaleTransaction t){
       boolean contains=false;
       for(Sale s:sales){
-        if(s.getCompanyId()==sale.getCompanyId() && s.getUserId() == sale.getUserId()){
+        if(s.getCompanyId()==t.getCompanyId() && s.getUserId() == t.getSellerId()){
           contains=true;
-          if(s.getValue()<sale.getValue()){
+          if(s.getValue()<t.getValue()){
             return false;
           }else{
-            s.setValue(s.getValue()-sale.getValue());
+            s.setValue(s.getValue()-t.getValue());
           }
         }
       }
@@ -92,6 +93,15 @@ public class MarketActor extends AbstractActor {
       }else{
         return false;
       }
+    }
+
+    public boolean doSale(SaleTransaction t){
+      if(removeSale(t)){
+        return true;
+      }else{
+        return false;
+      }
+
     }
   }
 
@@ -153,6 +163,40 @@ public class MarketActor extends AbstractActor {
     }
   }
 
+  public static class SaleTransaction{
+    private final int buyerId;
+    private final int companyId;
+    private final int sellerId;
+    private final int value;
+
+    public SaleTransaction(){
+      this.sellerId = 0;
+      this.buyerId = 0;
+      this.value = 0;
+      this.companyId = 0;
+    }
+
+    public SaleTransaction(int buyerId,int companyId,int sellerId,int value){
+      this.sellerId = sellerId;
+      this.buyerId = buyerId;
+      this.value = value;
+      this.companyId = companyId;
+    }
+
+    public int getBuyerId(){
+      return buyerId;
+    }
+    public int getSellerId(){
+      return sellerId;
+    }
+    public int getValue(){
+      return value;
+    }
+    public int getCompanyId(){
+      return companyId;
+    }
+  }
+
   static Props props() {
     return Props.create(MarketActor.class);
   }
@@ -176,19 +220,15 @@ public class MarketActor extends AbstractActor {
               getSender().tell(modifiedSale,getSelf());
 
             })
-            .match(MarketMessages.Buy.class, buy -> {
+            .match(MarketMessages.BuySale.class, buy -> {
 
-              Sale sale = buy.getSale();  
+              SaleTransaction t = buy.getTransaction();  
               boolean exists = false;
 
+
               //removing sale from sales list
-              exists = market.removeSale(sale);
-              
-              if(exists){
-                getSender().tell(sale,getSelf());
-              }else{
-                getSender().tell(new Sale(),getSelf());
-              }
+              exists = market.removeSale(t);
+              //reducing bank balance of user
               
             })
             .matchAny(o -> log.info("received unknown message"))

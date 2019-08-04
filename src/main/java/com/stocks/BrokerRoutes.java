@@ -16,6 +16,7 @@ import akka.http.javadsl.server.AllDirectives;
 import akka.http.javadsl.server.PathMatchers;
 import akka.http.javadsl.server.Route;
 import akka.pattern.Patterns;
+import com.stocks.MarketActor.SaleTransaction;
 
 /**
  * Routes can be defined in separated classes like shown in here
@@ -23,12 +24,14 @@ import akka.pattern.Patterns;
 public class BrokerRoutes extends AllDirectives {
     final private ActorRef brokerActor;
     final private ActorRef marketActor;
+    final private ActorRef bankActor;
     final private LoggingAdapter log;
 
 
-    public BrokerRoutes(ActorSystem system, ActorRef brokerActor, ActorRef marketActor) {
+    public BrokerRoutes(ActorSystem system, ActorRef brokerActor, ActorRef marketActor,ActorRef bankActor) {
         this.brokerActor = brokerActor;
         this.marketActor = marketActor;
+        this.bankActor = bankActor;
         log = Logging.getLogger(system, this);
     }
 
@@ -46,9 +49,14 @@ public class BrokerRoutes extends AllDirectives {
                     addSale()
                 )
             ),
-            pathPrefix("buy", () ->
+            pathPrefix("buy-sale", () ->
                 route(
-                    buy()
+                    buySale()
+                )
+            ),
+            pathPrefix("buy-company", () ->
+                route(
+                    buySale()
                 )
             )
         ));
@@ -80,24 +88,28 @@ public class BrokerRoutes extends AllDirectives {
         );
     }
 
-        private Route buy() {
+        private Route buySale() {
         return pathEnd(() ->
             route(
                 post(() -> 
                     entity(
-                        Jackson.unmarshaller(MarketActor.Sale.class),
+                        Jackson.unmarshaller(MarketActor.SaleTransaction.class),
                         sale->{
-                            log.info("Buying sale of user:"+sale.getUserId());
-                            CompletionStage<MarketActor.Sale> buy = Patterns
-                                    .ask(marketActor, new MarketMessages.Buy(sale), timeout)
-                                    .thenApply(MarketActor.Sale.class::cast);
+                            log.info("Adding sale of user:"+sale.getSellerId());
 
-                            return onSuccess(() -> buy,
-                                bought -> {
-                                    if(bought.getUserId()>0){
-                                        return complete(StatusCodes.OK, bought, Jackson.marshaller());
+                            CompletionStage<MarketActor.SaleTransaction> addSale = Patterns
+                                    .ask(bankActor, new BankMessages.DoTransaction(sale), timeout)
+                                    .thenApply(MarketActor.SaleTransaction.class::cast);
+
+                            return onSuccess(() -> addSale,
+                                addedSale -> {
+                                    if(addedSale.getSellerId()>0){
+                                        
+                                        marketActor.tell(new MarketMessages.BuySale(addedSale),brokerActor);
+
+                                        return complete(StatusCodes.OK, addedSale, Jackson.marshaller());
                                     }else{
-                                        return complete(StatusCodes.INTERNAL_SERVER_ERROR,"Cannod do the sale");
+                                        return complete(StatusCodes.INTERNAL_SERVER_ERROR,"Error buying sale!");
                                     }
                                 });
                         }
@@ -105,4 +117,5 @@ public class BrokerRoutes extends AllDirectives {
             )
         );
     }
+
 }
