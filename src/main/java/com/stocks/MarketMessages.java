@@ -77,4 +77,16 @@ public interface MarketMessages {
     class ChangeCompanyValues implements Serializable{
         
     }
+
+    class Buy implements Serializable{
+        private final Sale sale;
+
+        public Buy(Sale sale){
+            this.sale = sale;
+        }
+
+        public Sale getBuy(){
+            return sale;
+        }
+    }
 }

@@ -61,7 +61,7 @@ public class PlayerAIActor extends AbstractActor {
               brokerActor = actors.getBrokerActor();
             })
             .match(PlayerAIMessages.LookPlayerCompletion.class, look -> {
-              TimeUnit.SECONDS.sleep(5);
+              TimeUnit.SECONDS.sleep(59);
               log.info("##### AI Creating players ## ");
               
               int missingCount = 0;

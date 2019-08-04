@@ -17,6 +17,7 @@ public class MarketActor extends AbstractActor {
 
   //#user-case-classes
   public static class Market {
+    private final List<Sale> buys;
     private final List<Company> companies;
     private final List<Sale> sales;
 
@@ -47,6 +48,7 @@ public class MarketActor extends AbstractActor {
         companies.add(c10);
 
         this.sales = new ArrayList<>();
+        this.buys = new ArrayList<>();
 
     }
 
@@ -110,6 +112,14 @@ public class MarketActor extends AbstractActor {
       for(Company c:companies){
         c.setValue(rand.nextInt(100)+1);
       }
+    }
+
+    public void addBuy(Sale sale){
+        buys.add(sale);
+    }
+
+    public List<Sale> getBuys(){
+      return buys;
     }
   }
 
@@ -232,6 +242,11 @@ public class MarketActor extends AbstractActor {
               getSender().tell(modifiedSale,getSelf());
 
             })
+            .match(MarketMessages.Buy.class, buys -> {
+
+              market.addBuy(buys.getBuy());
+              
+            })
             .match(MarketMessages.BuySale.class, buy -> {
 
               SaleTransaction t = buy.getTransaction();  
@@ -240,12 +255,13 @@ public class MarketActor extends AbstractActor {
 
               //removing sale from sales list
               exists = market.removeSale(t);
+              market.addBuy(new Sale(t.getCompanyId(),t.getBuyerId(),t.getValue()));
               //reducing bank balance of user
               
             })
             .match(MarketMessages.ChangeCompanyValues.class, req -> {
               for(int i=0;i<10;i++){
-                TimeUnit.MINUTES.sleep(1);
+                // TimeUnit.MINUTES.sleep(1);
                 log.info("### changing company values ###");
                 market.changeCompanyValues();
               }

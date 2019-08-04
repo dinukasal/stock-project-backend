@@ -133,6 +133,9 @@ public class BrokerRoutes extends AllDirectives {
                             return onSuccess(() -> addSale,
                                 account -> {
                                     if(account.getUserId()>0){
+                                        
+                                        marketActor.tell(new MarketMessages.Buy(sale),brokerActor);
+
                                         return complete(StatusCodes.OK, account, Jackson.marshaller());
                                     }else{
                                         return complete(StatusCodes.INTERNAL_SERVER_ERROR,"Error buying!");

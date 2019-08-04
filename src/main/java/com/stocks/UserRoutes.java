@@ -33,7 +33,7 @@ public class UserRoutes extends AllDirectives {
     final private ActorRef aiActor;
     final private ActorRef marketActor;
     final private LoggingAdapter log;
-    final private int BANK_BALANCE=100;
+    final private int BANK_BALANCE=1000;
 
     public UserRoutes(ActorSystem system, ActorRef userRegistryActor,ActorRef bankActor,ActorRef clockActor,ActorRef aiActor,ActorRef marketActor) {
         this.userRegistryActor = userRegistryActor;
