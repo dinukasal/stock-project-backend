@@ -47,23 +47,6 @@ public class PlayerAIActor extends AbstractActor {
   @Override
   public Receive createReceive(){
     return receiveBuilder()
-            // .match(UserRegistryMessages.GetUsers.class, getUsers -> getSender().tell(new Users(users),getSelf()))
-            // .match(UserRegistryMessages.CreateUser.class, createUser -> {
-            //   users.add(createUser.getUser());
-            //   getSender().tell(new UserRegistryMessages.ActionPerformed(
-            //           String.format("User %s created.", createUser.getUser().getName())),getSelf());
-            // })
-            // .match(UserRegistryMessages.GetUser.class, getUser -> {
-            //   getSender().tell(users.stream()
-            //           .filter(user -> user.getName().equals(getUser.getName()))
-            //           .findFirst(), getSelf());
-            // })
-            // .match(UserRegistryMessages.DeleteUser.class, deleteUser -> {
-            //   users.removeIf(user -> user.getName().equals(deleteUser.getName()));
-            //   getSender().tell(new UserRegistryMessages.ActionPerformed(String.format("User %s deleted.", deleteUser.getName())),
-            //           getSelf());
-
-            // })
             .matchAny(o -> log.info("received unknown message"))
             .build();
   }

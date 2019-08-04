@@ -44,6 +44,48 @@ public class MarketActor extends AbstractActor {
     public List<Company> getCompanies(){
         return companies;
     }
+
+    public Sale addSale(Sale sale){
+      boolean exists = false;
+
+      for(Sale s:sales){
+        if(s.getCompanyId()==sale.getCompanyId() && s.getUserId() == sale.getUserId()){
+          exists=true;
+          s.setValue(s.getValue()+sale.getValue());
+          return s;
+        }
+      }
+
+      if(!exists){
+        sales.add(sale);
+        return sale;
+      }
+
+      return new Sale();
+    }
+
+    public List<Sale> getSales(){
+      return sales;
+    }
+
+    public boolean removeSale(Sale sale){
+      boolean contains=false;
+      for(Sale s:sales){
+        if(s.getCompanyId()==sale.getCompanyId() && s.getUserId() == sale.getUserId()){
+          contains=true;
+          if(s.getValue()<sale.getValue()){
+            return false;
+          }else{
+            s.setValue(s.getValue()-sale.getValue());
+          }
+        }
+      }
+      if(contains){
+        return true;
+      }else{
+        return false;
+      }
+    }
   }
 
   public static class Company{
@@ -71,11 +113,17 @@ public class MarketActor extends AbstractActor {
   }
 
   public static class Sale{
-    private final int userId;
     private final int companyId;
-    private final int value;
+    private final int userId;
+    private int value;
 
-    public Sale(int userId,int companyId,int value){
+    public Sale(){
+      this.userId=0;
+      this.companyId=0;
+      this.value=0;
+    }
+
+    public Sale(int companyId,int userId,int value){
       this.userId=userId;
       this.companyId=companyId;
       this.value=value;
@@ -83,6 +131,18 @@ public class MarketActor extends AbstractActor {
 
     public int getUserId(){
       return userId;
+    }
+
+    public int getCompanyId(){
+      return companyId;
+    }
+
+    public int getValue(){
+      return value;
+    }
+
+    public void setValue(int value){
+      this.value = value;
     }
   }
 
@@ -97,6 +157,28 @@ public class MarketActor extends AbstractActor {
     return receiveBuilder()
             .match(MarketMessages.GetCompanies.class, getCompanies -> {
               getSender().tell(market, getSelf());
+            })
+            .match(MarketMessages.AddSale.class, addSale -> {
+
+              Sale sale = addSale.getSale();  
+              Sale modifiedSale = market.addSale(sale);
+              getSender().tell(modifiedSale,getSelf());
+
+            })
+            .match(MarketMessages.Buy.class, buy -> {
+
+              Sale sale = buy.getSale();  
+              boolean exists = false;
+
+              //removing sale from sales list
+              exists = market.removeSale(sale);
+              
+              if(exists){
+                getSender().tell(sale,getSelf());
+              }else{
+                getSender().tell(new Sale(),getSelf());
+              }
+              
             })
             .matchAny(o -> log.info("received unknown message"))
             .build();

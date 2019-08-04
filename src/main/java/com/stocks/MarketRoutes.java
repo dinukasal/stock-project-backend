@@ -33,7 +33,7 @@ public class MarketRoutes extends AllDirectives {
     }
 
     // Required by the `ask` (?) method below
-    Duration timeout = Duration.ofSeconds(5l); // usually we'd obtain the timeout from the system's configuration
+    Duration timeout = Duration.ofSeconds(1l); // usually we'd obtain the timeout from the system's configuration
 
     /**
      * This method creates one route (of possibly many more that will be part of your Web App)

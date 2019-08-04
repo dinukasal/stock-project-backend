@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletionStage;
 
 import com.stocks.BankMessages.*;
+import com.stocks.MarketActor.*;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.event.Logging;
@@ -21,11 +22,13 @@ import akka.pattern.Patterns;
  */
 public class BrokerRoutes extends AllDirectives {
     final private ActorRef brokerActor;
+    final private ActorRef marketActor;
     final private LoggingAdapter log;
 
 
-    public BrokerRoutes(ActorSystem system, ActorRef brokerActor) {
+    public BrokerRoutes(ActorSystem system, ActorRef brokerActor, ActorRef marketActor) {
         this.brokerActor = brokerActor;
+        this.marketActor = marketActor;
         log = Logging.getLogger(system, this);
     }
 
@@ -37,35 +40,42 @@ public class BrokerRoutes extends AllDirectives {
      */
 
     public Route routes() {
-        return route(concat(pathPrefix("sell", () ->
-            route(
-                addSale()
+        return route(concat(
+            pathPrefix("sell", () ->
+                route(
+                    addSale()
+                )
+            ),
+            pathPrefix("buy", () ->
+                route(
+                    buy()
+                )
             )
-        ),
-        pathPrefix("buy", () ->
-            route(
-                buy()
-            )
-        )
         ));
     }
 
     private Route addSale() {
         return pathEnd(() ->
             route(
-                get(() -> {
-                    
-                CompletionStage<MarketActor.Sale> addSale = Patterns
-                        .ask(brokerActor, new BrokerMessages.Sell(), timeout)
-                        .thenApply(MarketActor.Sale.class::cast);
+                post(() -> 
+                    entity(
+                        Jackson.unmarshaller(MarketActor.Sale.class),
+                        sale->{
+                            log.info("Adding sale of user:"+sale.getUserId());
+                            CompletionStage<MarketActor.Sale> addSale = Patterns
+                                    .ask(marketActor, new MarketMessages.AddSale(sale), timeout)
+                                    .thenApply(MarketActor.Sale.class::cast);
 
-                return onSuccess(() -> addSale,
-                    bank -> {
-                            return complete(StatusCodes.OK, bank, Jackson.marshaller());
-                    }
-                    );
-
-                })
+                            return onSuccess(() -> addSale,
+                                addedSale -> {
+                                    if(addedSale.getUserId()>0){
+                                        return complete(StatusCodes.OK, addedSale, Jackson.marshaller());
+                                    }else{
+                                        return complete(StatusCodes.INTERNAL_SERVER_ERROR,"Error adding sale!");
+                                    }
+                                });
+                        }
+                    ))
             )
         );
     }
@@ -73,19 +83,25 @@ public class BrokerRoutes extends AllDirectives {
         private Route buy() {
         return pathEnd(() ->
             route(
-                get(() -> {
-                    
-                CompletionStage<MarketActor.Sale> buy = Patterns
-                        .ask(brokerActor, new BrokerMessages.Sell(), timeout)
-                        .thenApply(MarketActor.Sale.class::cast);
+                post(() -> 
+                    entity(
+                        Jackson.unmarshaller(MarketActor.Sale.class),
+                        sale->{
+                            log.info("Buying sale of user:"+sale.getUserId());
+                            CompletionStage<MarketActor.Sale> buy = Patterns
+                                    .ask(marketActor, new MarketMessages.Buy(sale), timeout)
+                                    .thenApply(MarketActor.Sale.class::cast);
 
-                return onSuccess(() -> buy,
-                    bank -> {
-                            return complete(StatusCodes.OK, bank, Jackson.marshaller());
-                    }
-                    );
-
-                })
+                            return onSuccess(() -> buy,
+                                bought -> {
+                                    if(bought.getUserId()>0){
+                                        return complete(StatusCodes.OK, bought, Jackson.marshaller());
+                                    }else{
+                                        return complete(StatusCodes.INTERNAL_SERVER_ERROR,"Cannod do the sale");
+                                    }
+                                });
+                        }
+                    ))
             )
         );
     }

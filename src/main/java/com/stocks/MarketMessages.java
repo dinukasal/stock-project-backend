@@ -1,6 +1,7 @@
 package com.stocks;
 
 import com.stocks.UserRegistryActor.User;
+import com.stocks.MarketActor.Sale;
 
 import java.io.Serializable;
 import java.util.*;  
@@ -33,5 +34,29 @@ public interface MarketMessages {
     }
 
     class GetCompanies implements Serializable {
+    }
+
+    class AddSale implements Serializable{
+        private final Sale sale;
+
+        public Sale getSale(){
+            return sale;
+        }
+
+        public AddSale(Sale sale){
+            this.sale=sale;
+        }
+    }
+
+    class Buy implements Serializable{
+        private final Sale sale;
+
+        public Sale getSale(){
+            return sale;
+        }
+
+        public Buy(Sale sale){
+            this.sale=sale;
+        }
     }
 }
